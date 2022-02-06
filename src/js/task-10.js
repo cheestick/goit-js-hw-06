@@ -28,7 +28,7 @@ function createBoxes(amount) {
   const boxes = [];
   let prevBoxSize = getLastBoxSize();
   for (let i = 0; i < amount; i += 1) {
-    prevBoxSize = prevBoxSize === 0 ? size.INITIAL : (prevBoxSize += size.STEP);
+    prevBoxSize += prevBoxSize === 0 ? size.INITIAL : size.STEP;
     const box = createBox(prevBoxSize);
     boxes.push(box);
   }
