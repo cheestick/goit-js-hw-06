@@ -1,7 +1,5 @@
 const refs = {
   loginForm: document.querySelector('.login-form'),
-  // email: document.querySelector('input[type="email"]'),
-  // password: document.querySelector('input[type="password"]'),
 };
 
 refs.loginForm.addEventListener('submit', loginFormSubmitHandler);
@@ -10,45 +8,41 @@ function loginFormSubmitHandler(event) {
   event.preventDefault();
 
   const form = event.currentTarget;
-  const formElements = form.elements;
+  const formData = new FormData(form);
 
-  const fieldsNames = takeFormFieldsNames(formElements);
-  const fieldsRefs = takeFiledsRefByFieldsNames(fieldsNames, formElements);
+  if (!validateFormFileds(formData)) return;
 
-  if (!validateFormFileds(fieldsRefs)) return;
-
-  const data = gatherDataByFiledsNames(fieldsRefs);
-  console.log(data);
+  const userData = harvestUserData(formData);
+  console.log(userData);
 
   form.reset();
 }
 
-function validateFormFileds(fields) {
-  for (const key in fields) {
-    if (fields[key].value === '') {
-      alert('All user data field must be filled!');
-      return false;
-    }
-  }
-  return true;
+function validateFormFileds(formData) {
+  const invalidValues = getInvalidFieldsNames(formData);
+
+  if (invalidValues.length === 0) return true;
+
+  alert(
+    `All user data fields must be filled!
+    Please enter ${invalidValues.join(', ')}`,
+  );
+  return false;
 }
 
-function takeFormFieldsNames(elements) {
-  return Object.keys(elements)
-    .join(' ')
-    .match(/([A-Z])+/gi);
+function getInvalidFieldsNames(formData) {
+  const invalidValues = [];
+
+  formData.forEach((value, name) => {
+    if (value === '') invalidValues.push(name);
+  });
+
+  return invalidValues;
 }
 
-function takeFiledsRefByFieldsNames(fieldsNames, formElements) {
-  const fieldsRefs = Object.create(null);
-  fieldsNames.forEach(name => (fieldsRefs[name] = formElements[name]));
-  return fieldsRefs;
-}
-
-function gatherDataByFiledsNames(fields) {
+function harvestUserData(formData) {
   const userData = Object.create(null);
-  for (const key in fields) {
-    userData[key] = fields[key].value;
-  }
+  formData.forEach((value, name) => (userData[name] = value));
+
   return userData;
 }
